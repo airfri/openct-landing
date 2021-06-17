@@ -35,6 +35,9 @@ class Teams2 extends React.PureComponent {
     return (
       <div {...props} {...dataSource.wrapper}>
         <div {...dataSource.page}>
+          <div className="title-line-wrapper page2-line">
+              <div className="title-line" />
+            </div>
           <div {...dataSource.titleWrapper}>
             {dataSource.titleWrapper.children.map(getChildrenToRender)}
           </div>
@@ -55,4 +58,6 @@ class Teams2 extends React.PureComponent {
     );
   }
 }
+
+
 export default Teams2;
