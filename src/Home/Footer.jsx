@@ -72,7 +72,7 @@ function Footer() {
           <Col lg={6} sm={24} xs={24}>
             <div className="footer-center">
               <h2>社区</h2>
-              <div>
+              {/* <div>
                 <a href="#">
                   更新记录
                 </a>
@@ -81,7 +81,7 @@ function Footer() {
                 <a href="#">
                   常见问题
                 </a>
-              </div>
+              </div> */}
               <div>
                 <a target="_blank" rel="noopener" href="https://gitter.im/ant-design/ant-design-pro">
                   在线讨论
