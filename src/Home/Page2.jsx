@@ -1,40 +1,170 @@
 import React from 'react';
-import { OverPack } from 'rc-scroll-anim';
-import QueueAnim from 'rc-queue-anim';
-import { Button } from 'antd';
+import PropTypes from 'prop-types';
+import Parallax from 'rc-scroll-anim/lib/ScrollParallax';
+import TweenOne from 'rc-tween-one';
 
-function Page2() {
-  return (
-    <div className="home-page page2">
-      <div className="home-page-wrapper">
-        <div className="title-line-wrapper page2-line">
-          <div className="title-line" />
-        </div>
-        <h2><span>细节功能</span></h2>
-        <OverPack>
-          <QueueAnim key="queue" type="bottom" leaveReverse className="page2-content">
-            <p key="p" className="page-content">
-              集成选择、填空、拖拽、可视化编程等多种题型
-            </p>
-            <div key="code1" className="home-code">
-              <div>
-                $ <span>可视化编程</span> 集成块状编程系统
-              </div>
-              <div>$ <span>嵌入拖拽组件</span> 多模式拖拽</div>
-              <div>$ <span>设置选择模块</span> 多种选择题型</div>
-              <div>$ <span>整合填空模块</span> 多类型填空题</div>
+const { TweenOneGroup } = TweenOne;
+
+const featuresCN = [
+  {
+    title: '可视化编程',
+    content: ' 集成块状编程系统',
+    src: 'https://gw.alipayobjects.com/zos/rmsportal/VriUmzNjDnjoFoFFZvuh.svg',
+    color: '#13C2C2',
+    shadowColor: 'rgba(19,194,194,.12)',
+  },
+  {
+    title: '嵌入拖拽组件',
+    content: '多模式拖拽',
+    src: 'https://gw.alipayobjects.com/zos/rmsportal/smwQOoxCjXVbNAKMqvWk.svg',
+    color: '#2F54EB',
+    shadowColor: 'rgba(47,84,235,.12)',
+  },
+  {
+    title: '设置选择模块',
+    content: '多种选择题型',
+    src: 'https://gw.alipayobjects.com/zos/rmsportal/hBbIHzUsSbSxrhoRFYzi.svg',
+    color: '#F5222D',
+    shadowColor: 'rgba(245,34,45,.12)',
+  },
+  {
+    title: '整合填空模块',
+    content: '多类型填空题',
+    src: 'https://gw.alipayobjects.com/zos/rmsportal/BISfzKcCNCYFmTYcUygW.svg', 
+    color: '#1AC44D',
+    shadowColor: 'rgba(26,196,77,.12)',
+  },
+];
+
+const pointPos = [
+  { x: -30, y: -10 },
+  { x: 20, y: -20 },
+  { x: -65, y: 15 },
+  { x: -45, y: 80 },
+  { x: 35, y: 5 },
+  { x: 50, y: 50, opacity: 0.2 },
+];
+
+class Page2 extends React.PureComponent {
+  static propTypes = {
+    isMobile: PropTypes.bool.isRequired,
+  }
+  constructor(props) {
+    super(props);
+    this.state = {
+      hoverNum: null,
+    };
+  }
+  onMouseOver = (i) => {
+    this.setState({
+      hoverNum: i,
+    });
+  }
+  onMouseOut = () => {
+    this.setState({
+      hoverNum: null,
+    });
+  }
+  getEnter = (e) => {
+    const i = e.index;
+    const r = (Math.random() * 2) - 1;
+    const y = (Math.random() * 10) + 5;
+    const delay = Math.round(Math.random() * (i * 50));
+    return [
+      {
+        delay, opacity: 0.4, ...pointPos[e.index], ease: 'easeOutBack', duration: 300,
+      },
+      {
+        y: r > 0 ? `+=${y}` : `-=${y}`,
+        duration: (Math.random() * 1000) + 2000,
+        yoyo: true,
+        repeat: -1,
+      }];
+  }
+  render() {
+    const { hoverNum } = this.state;
+    let children = [[], [], []];
+    featuresCN.forEach((item, i) => {
+      const isHover = hoverNum === i;
+      const pointChild = [
+        'point-0 left', 'point-0 right',
+        'point-ring', 'point-1', 'point-2', 'point-3',
+      ].map(className => (
+        <TweenOne
+          component="i"
+          className={className}
+          key={className}
+          style={{
+            background: item.color,
+            borderColor: item.color,
+          }}
+        />
+      ));
+      const child = (
+        <li key={i.toString()} >
+          <div
+            className="page1-box"
+            onMouseEnter={() => { this.onMouseOver(i); }}
+            onMouseLeave={this.onMouseOut}
+          >
+            <TweenOneGroup
+              className="page1-point-wrapper"
+              enter={this.getEnter}
+              leave={{
+                x: 0, y: 30, opacity: 0, duration: 300, ease: 'easeInBack',
+              }}
+              resetStyleBool={false}
+            >
+              {(this.props.isMobile || isHover) && pointChild}
+            </TweenOneGroup>
+            <div
+              className="page1-image"
+              style={{
+                boxShadow: `${isHover ? '0 12px 24px' :
+                  '0 6px 12px'} ${item.shadowColor}`,
+              }}
+            >
+              <img src={item.src} alt="img" style={i === 4 ? { marginLeft: -15 } : {}} />
             </div>
-           <div key="button" style={{ marginTop: 88 }}>
-              <a href="/ticket-login-card" target="_blank" rel="noopener noreferrer">
-                <Button type="primary">开始测试</Button>
-              </a>
-            </div>
-          </QueueAnim>
-        </OverPack>
+            <h3>{item.title}</h3>
+            <p>{item.content}</p>
+          </div>
+        </li>
+      );
+      children[Math.floor(i / 4)].push(child);
+    });
+
+    children = children.map((item, i) => (
+      <div
+        className="page1-box-wrapper"
+      >
+        {item}
       </div>
-    </div>
-  );
+    ));
+    return (
+      <div className="home-page" >
+        <div className="home-page-wrapper" id="page1-wrapper">
+          {!this.props.isMobile && (
+            <Parallax
+              className="page1-bg"
+              animation={{ translateY: -600, ease: 'linear', playScale: [0, 1.65] }}
+              location="page1-wrapper"
+            >
+              Feature
+            </Parallax>
+          )}
+          <div className="title-line-wrapper page2-line">
+          <div className="title-line" />
+          </div>
+          <h2>细节功能</h2>
+          <p key="p" className="page-content text-center">集成选择、填空、拖拽、可视化编程等多种题型</p>
+          {/*<OverPack>*/}
+          {children}
+          {/*</OverPack>*/}
+        </div>
+      </div>
+    );
+  }
 }
-
-
 export default Page2;
+
